@@ -49,12 +49,20 @@ All SLL operations plus:
 ---
 
 ### 🌳 Trees (`Trees.cpp`)
-**Binary Search Tree (BST)**
-| Method | Description |
-|---|---|
-| `insert` | Iterative insertion, handles duplicates |
-| `contains` | Iterative search, O(log n) average |
 
+**Binary Search Tree (BST)**
+
+| Method | Description |
+| --- | --- |
+| `insert` | Iterative insertion, equal values go left |
+| `contains` | Iterative search, O(log n) average |
+| `inOrder` | Left → Root → Right, outputs sorted ascending order |
+| `preOrder` | Root → Left → Right, useful for copying the tree |
+| `postOrder` | Left → Right → Root, useful for deleting the tree |
+| `deleteNode` | Recursive deletion — handles leaf, one child, and two children (in-order successor) cases |
+| `search` | Finds all nodes with an exact value, handles duplicates |
+| `displayLessOrEqual` | Prints all nodes with value <= limit in sorted order |
+| `displayGreaterOrEqual` | Prints all nodes with value >= limit in sorted order |
 ---
 
 ### 📊 Sorting Algorithms
