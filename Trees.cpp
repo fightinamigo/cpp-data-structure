@@ -1,82 +1,217 @@
 #include <iostream>
-
 using namespace std;
 
+// ============================================================
+//  BINARY SEARCH TREE — Complete Implementation
+//  Operations:
+//   1. insert                — iterative, duplicates go left
+//   2. contains              — iterative search
+//   3. inOrder               — Left → Root → Right (sorted)
+//   4. preOrder              — Root → Left → Right
+//   5. postOrder             — Left → Right → Root
+//   6. deleteNode            — handles all 3 cases (recursive)
+//   7. search                — find all nodes with exact value
+//   8. displayLessOrEqual    — all nodes with value <= limit
+//   9. displayGreaterOrEqual — all nodes with value >= limit
+// ============================================================
+
+
+// ── NODE ────────────────────────────────────────────────────
 
 class Node {
-    public:
-        int value ;
-        Node* left;
-        Node* right;
+public:
+    int value;
+    Node* left;
+    Node* right;
 
     Node(int value) {
         this->value = value;
-        left = nullptr;
+        left  = nullptr;
         right = nullptr;
     }
 };
 
 
+// ── BST ─────────────────────────────────────────────────────
+
 class BST {
-    public:
-        Node* root;
-        BST() {
-            root = nullptr;
+public:
+    Node* root;
+
+    BST() {
+        root = nullptr;
+    }
+
+    // ── 1. INSERT (iterative) ──────────────────────────────
+    // Equal values go LEFT
+    bool insert(int value) {
+        Node* newNode = new Node(value);
+        if (root == nullptr) {
+            root = newNode;
+            return true;
         }
-        bool insert(const int value) {
-            Node* newNode = new Node(value);
-            if (root == nullptr) {
-                root = newNode;
+        Node* temp = root;
+        while (true) {
+            if (newNode->value < temp->value) {
+                if (temp->left == nullptr) { temp->left = newNode; return true; }
+                temp = temp->left;
+            } else {
+                if (temp->right == nullptr) { temp->right = newNode; return true; }
+                temp = temp->right;
+            }
+        }
+    }
+
+    // ── 2. CONTAINS (iterative) ────────────────────────────
+    // Returns true if value exists, false otherwise
+    bool contains(int value) {
+        if (root == nullptr) return false;
+        Node* temp = root;
+        while (temp) {
+            if (value < temp->value)      temp = temp->left;
+            else if (value > temp->value) temp = temp->right;
+            else {
+                cout << "Found: " << temp->value << endl;
                 return true;
             }
-            Node* temp = root;
-            while (true) {
-                if (newNode->value == temp->value) {
-                    cout << "value already exists " << endl;
-                    return false;
-                }
-                if ( newNode->value < temp->value ) {
-                    if (temp->left == nullptr) {
-                        temp->left = newNode;
-                        return true;
-                    }
-                    temp = temp->left;
-                }else {
-                    if (temp->right == nullptr) {
-                        temp->right = newNode;
-                        return true;
-                    }
-                    temp = temp->right;
-                }
-            }
         }
+        cout << "Not found" << endl;
+        return false;
+    }
 
+    // ── 3. IN-ORDER: Left → Root → Right ──────────────────
+    // Result: ascending sorted order
+    void inOrder(Node* node) {
+        if (node == nullptr) return;
+        inOrder(node->left);
+        cout << node->value << " ";
+        inOrder(node->right);
+    }
+    void inOrder() { inOrder(root); cout << endl; }
 
-        bool contains( int value) {
-            if (root == nullptr) {
-                return false;
+    // ── 4. PRE-ORDER: Root → Left → Right ─────────────────
+    // Result: useful for copying the tree
+    void preOrder(Node* node) {
+        if (node == nullptr) return;
+        cout << node->value << " ";
+        preOrder(node->left);
+        preOrder(node->right);
+    }
+    void preOrder() { preOrder(root); cout << endl; }
+
+    // ── 5. POST-ORDER: Left → Right → Root ────────────────
+    // Result: useful for deleting the tree
+    void postOrder(Node* node) {
+        if (node == nullptr) return;
+        postOrder(node->left);
+        postOrder(node->right);
+        cout << node->value << " ";
+    }
+    void postOrder() { postOrder(root); cout << endl; }
+
+    // ── 6. DELETE NODE (recursive) ────────────────────────
+    // Case 1: leaf node     → just remove
+    // Case 2: one child     → link parent directly to that child
+    // Case 3: two children  → replace with in-order successor
+    //                         (smallest node in right subtree)
+    Node* minNode(Node* node) {
+        while (node->left != nullptr)
+            node = node->left;
+        return node;
+    }
+
+    Node* deleteNode(Node* node, int value) {
+        if (node == nullptr) return nullptr;
+
+        if (value < node->value) {
+            node->left = deleteNode(node->left, value);
+        } else if (value > node->value) {
+            node->right = deleteNode(node->right, value);
+        } else {
+            // CASE 1: leaf
+            if (node->left == nullptr && node->right == nullptr) {
+                delete node;
+                return nullptr;
             }
-            Node* temp = root;
-            while (temp) {
-               if (temp->value > value) {
-                   temp = temp->left;
-               }
-               else if (temp->value < value) {
-                    temp = temp->right;
-               }
-               else {
-                   cout << "Found value "<< temp->value << endl;
-                   return true;
-               }
+            // CASE 2a: only right child
+            if (node->left == nullptr) {
+                Node* temp = node->right;
+                delete node;
+                return temp;
             }
-            cout << "Not found" << endl;
-            return false;
+            // CASE 2b: only left child
+            if (node->right == nullptr) {
+                Node* temp = node->left;
+                delete node;
+                return temp;
+            }
+            // CASE 3: two children → replace with in-order successor
+            Node* successor = minNode(node->right);
+            node->value = successor->value;
+            node->right = deleteNode(node->right, successor->value);
         }
+        return node;
+    }
+    void deleteNode(int value) {
+        root = deleteNode(root, value);
+    }
+
+    // ── 7. SEARCH: find all nodes with exact value ─────────
+    // Uses inOrder traversal — continues left after a match
+    // because duplicates are stored on the left
+    void search(Node* node, int value) {
+        if (node == nullptr) return;
+        search(node->left, value);
+        if (node->value == value)
+            cout << "Found: " << node->value << endl;
+        if (node->value <= value)
+            search(node->right, value);
+    }
+    void search(int value) {
+        cout << "Searching for " << value << ":" << endl;
+        search(root, value);
+    }
+
+    // ── 8. DISPLAY LESS OR EQUAL: value <= limit ───────────
+    // Prints all nodes with value <= limit in sorted order
+    // Skips right subtree early once current node exceeds limit
+    void displayLessOrEqual(Node* node, int limit) {
+        if (node == nullptr) return;
+        displayLessOrEqual(node->left, limit);
+        if (node->value <= limit)
+            cout << node->value << " ";
+        if (node->value < limit)
+            displayLessOrEqual(node->right, limit);
+    }
+    void displayLessOrEqual(int limit) {
+        cout << "Values <= " << limit << ": ";
+        displayLessOrEqual(root, limit);
+        cout << endl;
+    }
+
+    // ── 9. DISPLAY GREATER OR EQUAL: value >= limit ────────
+    // Prints all nodes with value >= limit in sorted order
+    // Skips left subtree early once current node is below limit
+    void displayGreaterOrEqual(Node* node, int limit) {
+        if (node == nullptr) return;
+        if (node->value > limit)
+            displayGreaterOrEqual(node->left, limit);
+        if (node->value >= limit)
+            cout << node->value << " ";
+        displayGreaterOrEqual(node->right, limit);
+    }
+    void displayGreaterOrEqual(int limit) {
+        cout << "Values >= " << limit << ": ";
+        displayGreaterOrEqual(root, limit);
+        cout << endl;
+    }
 };
 
-int main() {
-    BST* myBST = new BST() ;
 
+// ── MAIN ─────────────────────────────────────────────────────
+
+int main() {
+    BST* myBST = new BST();
 
     myBST->insert(47);
     myBST->insert(20);
@@ -85,17 +220,38 @@ int main() {
     myBST->insert(52);
     myBST->insert(82);
     myBST->insert(27);
+    myBST->insert(20); // duplicate → goes left
 
-    int x;
-    cout << "Please enter an integer to search for in the tree: " << endl;
-    cin >> x;
-    cout << "Searching for the value in the tree: " << endl;
-    cout << myBST->contains(x)<< endl;
+    // ── Traversals ──
+    cout << "=== Traversals ===" << endl;
+    cout << "In-Order   (sorted): "; myBST->inOrder();    // 17 20 20 27 47 52 70 82
+    cout << "Pre-Order           : "; myBST->preOrder();   // 47 20 17 20 27 70 52 82
+    cout << "Post-Order          : "; myBST->postOrder();  // 17 20 27 20 52 82 70 47
 
-    cout << endl;
+    // ── Contains ──
+    cout << "\n=== Contains ===" << endl;
+    myBST->contains(20);  // Found
+    myBST->contains(99);  // Not found
 
+    // ── Search ──
+    cout << "\n=== Search ===" << endl;
+    myBST->search(20);    // finds both 20s
 
+    // ── Range queries ──
+    cout << "\n=== Range Queries ===" << endl;
+    myBST->displayLessOrEqual(47);    // 17 20 20 27 47
+    myBST->displayGreaterOrEqual(47); // 47 52 70 82
 
+    // ── Delete ──
+    cout << "\n=== Delete ===" << endl;
+    cout << "Before: "; myBST->inOrder();
+    myBST->deleteNode(20);  // Case 3: two children
+    cout << "After deleting 20: "; myBST->inOrder();
+    myBST->deleteNode(82);  // Case 1: leaf
+    cout << "After deleting 82: "; myBST->inOrder();
+    myBST->deleteNode(70);  // Case 2: one child
+    cout << "After deleting 70: "; myBST->inOrder();
 
+    delete myBST;
     return 0;
 }
