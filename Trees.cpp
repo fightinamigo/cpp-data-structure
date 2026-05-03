@@ -1,4 +1,5 @@
 #include <iostream>
+#include <queue>
 using namespace std;
 
 // ============================================================
@@ -61,22 +62,21 @@ public:
             }
         }
     }
+
     // ── 2. INSERT (Recursive) ──────────────────────────────
     // Equal values go LEFT
     Node* rInsert(Node* currentNode, int value) {
         if (currentNode == nullptr) return new Node(value);
 
-        if (value < currentNode->value) {
+        if (value <= currentNode->value) {
             currentNode->left = rInsert(currentNode->left, value);
         } else {
             currentNode->right = rInsert(currentNode->right, value);
         }
         return currentNode;
     }
-
-    bool rInsert(int value) {
-        if (root == nullptr) root = new Node(value);
-        return rInsert(root, value);
+    void rInsert(int value) {
+        root = rInsert(root, value);
     }
 
     // ── 3. CONTAINS (iterative) ────────────────────────────
@@ -111,7 +111,28 @@ public:
         return rContains(root, value);
     }
 
-    // ── 5. IN-ORDER: Left → Root → Right ──────────────────
+
+    // — 5. Breadth First Search:
+    // Result: level-by-level order (top to bottom, left to right)
+    void BFS() {
+        queue<Node*> myQueue;
+        myQueue.push(root);
+
+        while (myQueue.size() > 0) {
+            Node* currentNode = myQueue.front();
+            myQueue.pop();
+            cout << currentNode->value << " ";
+            if (currentNode->left) {
+                myQueue.push(currentNode->left);
+            }
+            if (currentNode->right) {
+                myQueue.push(currentNode->right);
+            }
+        }
+        cout << endl;
+    }
+
+    // ── 6. IN-ORDER: Left → Root → Right ──────────────────
     // Result: ascending sorted order
     void inOrder(Node* node) {
         if (node == nullptr) return;
@@ -121,7 +142,7 @@ public:
     }
     void inOrder() { inOrder(root); cout << endl; }
 
-    // ── 6. PRE-ORDER: Root → Left → Right ─────────────────
+    // ── 7. PRE-ORDER: Root → Left → Right ─────────────────
     // Result: useful for copying the tree
     void preOrder(Node* node) {
         if (node == nullptr) return;
@@ -131,7 +152,7 @@ public:
     }
     void preOrder() { preOrder(root); cout << endl; }
 
-    // ── 7. POST-ORDER: Left → Right → Root ────────────────
+    // ── 8. POST-ORDER: Left → Right → Root ────────────────
     // Result: useful for deleting the tree
     void postOrder(Node* node) {
         if (node == nullptr) return;
@@ -141,7 +162,7 @@ public:
     }
     void postOrder() { postOrder(root); cout << endl; }
 
-    // ── 8. DELETE NODE (recursive) ────────────────────────
+    // ── 9. DELETE NODE (recursive) ────────────────────────
     // Case 1: leaf node     → just remove
     // Case 2: one child     → link parent directly to that child
     // Case 3: two children  → replace with in-order successor
@@ -188,7 +209,7 @@ public:
         root = deleteNode(root, value);
     }
 
-    // ── 9. SEARCH: find all nodes with exact value ─────────
+    // ── 10. SEARCH: find all nodes with exact value ─────────
     // Uses inOrder traversal — continues left after a match
     // because duplicates are stored on the left
     void search(Node* node, int value) {
@@ -204,7 +225,7 @@ public:
         search(root, value);
     }
 
-    // ── 10. DISPLAY LESS OR EQUAL: value <= limit ───────────
+    // ── 11. DISPLAY LESS OR EQUAL: value <= limit ───────────
     // Prints all nodes with value <= limit in sorted order
     // Skips right subtree early once current node exceeds limit
     void displayLessOrEqual(Node* node, int limit) {
@@ -221,7 +242,7 @@ public:
         cout << endl;
     }
 
-    // ── 11. DISPLAY GREATER OR EQUAL: value >= limit ────────
+    // ── 12. DISPLAY GREATER OR EQUAL: value >= limit ────────
     // Prints all nodes with value >= limit in sorted order
     // Skips left subtree early once current node is below limit
     void displayGreaterOrEqual(Node* node, int limit) {
@@ -281,6 +302,10 @@ int main() {
     // ── Search ──
     cout << "\n=== Search ===" << endl;
     myBST->search(20);    // finds both 20s
+
+    // ── BFS ──
+    cout << "\n=== BFS ===" << endl;
+    myBST->BFS();
 
     // ── Range queries ──
     cout << "\n=== Range Queries ===" << endl;
