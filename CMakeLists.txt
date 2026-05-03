@@ -28,3 +28,6 @@ add_executable(BinarySearch BinarySearch.cpp)
 add_executable(Graph        Graph.cpp)
 add_executable(Hash         Hash.cpp)
 add_executable(Heap         Heap.cpp)
+
+# ── Recursion ─────────────────────────────────
+add_executable(recursion    recursion.cpp )

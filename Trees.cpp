@@ -52,7 +52,7 @@ public:
         }
         Node* temp = root;
         while (true) {
-            if (newNode->value < temp->value) {
+            if (newNode->value <= temp->value) {
                 if (temp->left == nullptr) { temp->left = newNode; return true; }
                 temp = temp->left;
             } else {
@@ -61,8 +61,25 @@ public:
             }
         }
     }
+    // ── 2. INSERT (Recursive) ──────────────────────────────
+    // Equal values go LEFT
+    Node* rInsert(Node* currentNode, int value) {
+        if (currentNode == nullptr) return new Node(value);
 
-    // ── 2. CONTAINS (iterative) ────────────────────────────
+        if (value < currentNode->value) {
+            currentNode->left = rInsert(currentNode->left, value);
+        } else {
+            currentNode->right = rInsert(currentNode->right, value);
+        }
+        return currentNode;
+    }
+
+    bool rInsert(int value) {
+        if (root == nullptr) root = new Node(value);
+        return rInsert(root, value);
+    }
+
+    // ── 3. CONTAINS (iterative) ────────────────────────────
     // Returns true if value exists, false otherwise
     bool contains(int value) {
         if (root == nullptr) return false;
@@ -79,7 +96,22 @@ public:
         return false;
     }
 
-    // ── 3. IN-ORDER: Left → Root → Right ──────────────────
+    // ── 4. CONTAINS (Recursive) ────────────────────────────
+    // Returns true if value exists, false otherwise
+    bool rContains(Node* currentNode, int value) {
+        if (currentNode == nullptr) return false;
+        if (currentNode->value == value) return true;
+        if (currentNode->value > value) {
+            return rContains(currentNode->left, value);
+        }
+        return rContains(currentNode->right, value);
+
+    }
+    bool rContains(int value) {
+        return rContains(root, value);
+    }
+
+    // ── 5. IN-ORDER: Left → Root → Right ──────────────────
     // Result: ascending sorted order
     void inOrder(Node* node) {
         if (node == nullptr) return;
@@ -89,7 +121,7 @@ public:
     }
     void inOrder() { inOrder(root); cout << endl; }
 
-    // ── 4. PRE-ORDER: Root → Left → Right ─────────────────
+    // ── 6. PRE-ORDER: Root → Left → Right ─────────────────
     // Result: useful for copying the tree
     void preOrder(Node* node) {
         if (node == nullptr) return;
@@ -99,7 +131,7 @@ public:
     }
     void preOrder() { preOrder(root); cout << endl; }
 
-    // ── 5. POST-ORDER: Left → Right → Root ────────────────
+    // ── 7. POST-ORDER: Left → Right → Root ────────────────
     // Result: useful for deleting the tree
     void postOrder(Node* node) {
         if (node == nullptr) return;
@@ -109,13 +141,13 @@ public:
     }
     void postOrder() { postOrder(root); cout << endl; }
 
-    // ── 6. DELETE NODE (recursive) ────────────────────────
+    // ── 8. DELETE NODE (recursive) ────────────────────────
     // Case 1: leaf node     → just remove
     // Case 2: one child     → link parent directly to that child
     // Case 3: two children  → replace with in-order successor
     //                         (smallest node in right subtree)
     Node* minNode(Node* node) {
-        while (node->left != nullptr)
+        while (node->left)
             node = node->left;
         return node;
     }
@@ -156,7 +188,7 @@ public:
         root = deleteNode(root, value);
     }
 
-    // ── 7. SEARCH: find all nodes with exact value ─────────
+    // ── 9. SEARCH: find all nodes with exact value ─────────
     // Uses inOrder traversal — continues left after a match
     // because duplicates are stored on the left
     void search(Node* node, int value) {
@@ -164,7 +196,7 @@ public:
         search(node->left, value);
         if (node->value == value)
             cout << "Found: " << node->value << endl;
-        if (node->value <= value)
+        if (node->value < value)
             search(node->right, value);
     }
     void search(int value) {
@@ -172,7 +204,7 @@ public:
         search(root, value);
     }
 
-    // ── 8. DISPLAY LESS OR EQUAL: value <= limit ───────────
+    // ── 10. DISPLAY LESS OR EQUAL: value <= limit ───────────
     // Prints all nodes with value <= limit in sorted order
     // Skips right subtree early once current node exceeds limit
     void displayLessOrEqual(Node* node, int limit) {
@@ -189,7 +221,7 @@ public:
         cout << endl;
     }
 
-    // ── 9. DISPLAY GREATER OR EQUAL: value >= limit ────────
+    // ── 11. DISPLAY GREATER OR EQUAL: value >= limit ────────
     // Prints all nodes with value >= limit in sorted order
     // Skips left subtree early once current node is below limit
     void displayGreaterOrEqual(Node* node, int limit) {
@@ -213,14 +245,22 @@ public:
 int main() {
     BST* myBST = new BST();
 
-    myBST->insert(47);
-    myBST->insert(20);
-    myBST->insert(70);
-    myBST->insert(17);
-    myBST->insert(52);
-    myBST->insert(82);
-    myBST->insert(27);
-    myBST->insert(20); // duplicate → goes left
+    // myBST->insert(47);
+    // myBST->insert(20);
+    // myBST->insert(70);
+    // myBST->insert(17);
+    // myBST->insert(52);
+    // myBST->insert(82);
+    // myBST->insert(27);
+    // myBST->insert(20); // duplicate → goes left
+    myBST->rInsert(47);
+    myBST->rInsert(20);
+    myBST->rInsert(70);
+    myBST->rInsert(17);
+    myBST->rInsert(52);
+    myBST->rInsert(82);
+    myBST->rInsert(27);
+    myBST->rInsert(20); // duplicate → goes left
 
     // ── Traversals ──
     cout << "=== Traversals ===" << endl;
@@ -232,6 +272,11 @@ int main() {
     cout << "\n=== Contains ===" << endl;
     myBST->contains(20);  // Found
     myBST->contains(99);  // Not found
+
+    // ── Recursive Contains ──
+    cout << "\n=== Recursive Contains ===" << endl;
+    cout << myBST->rContains(20); // Found
+    cout << myBST->rContains(99); // Not found
 
     // ── Search ──
     cout << "\n=== Search ===" << endl;
