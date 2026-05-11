@@ -35,11 +35,11 @@ class Queue {
                 cout << "Empty Queue" << endl;
             }
             else {
-                while (temp != nullptr) {
+                while (temp) {
                     cout << temp->value;
                     temp = temp->next;
-                    if (temp != nullptr) {
-                        cout << "->" << endl;
+                    if (temp) {
+                        cout << "->";
                     }
                 }
             }
@@ -50,7 +50,7 @@ class Queue {
             cout << "First: " << first->value << endl;
         }
 
-        void getLasr() {
+        void getLast() {
             cout << "Last: " << last->value << endl;
         }
 
@@ -79,14 +79,11 @@ class Queue {
             Node* temp = first;
             int dequeuedValue = first->value;
             if (length == 1) {
-
                 first = nullptr;
                 last = nullptr;
             }
             else {
                 first = first->next;
-
-
             }
             delete temp;
             length--;
@@ -115,5 +112,24 @@ class Queue {
 
 
 int main() {
+    Queue *myQueue = new Queue(0);
+    myQueue->enqueue(1);
+    myQueue->enqueue(2);
+    myQueue->enqueue(3);
+    myQueue->enqueue(4);
 
+    myQueue->printQueue();
+
+    myQueue->getFirst();
+    myQueue->getLast();
+    myQueue->getLength();
+
+    cout << "dequeued value: " << myQueue->dequeue() << endl;
+
+    myQueue->printQueue();
+    myQueue->getFirst();
+    myQueue->getLast();
+    myQueue->getLength();
+
+    return 0;
 }
