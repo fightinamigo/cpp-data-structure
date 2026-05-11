@@ -6,14 +6,17 @@ using namespace std;
 //  BINARY SEARCH TREE — Complete Implementation
 //  Operations:
 //   1. insert                — iterative, duplicates go left
-//   2. contains              — iterative search
-//   3. inOrder               — Left → Root → Right (sorted)
-//   4. preOrder              — Root → Left → Right
-//   5. postOrder             — Left → Right → Root
-//   6. deleteNode            — handles all 3 cases (recursive)
-//   7. search                — find all nodes with exact value
-//   8. displayLessOrEqual    — all nodes with value <= limit
-//   9. displayGreaterOrEqual — all nodes with value >= limit
+//   2. rInsert               — recursive insertion
+//   3. contains              — iterative search (true/false)
+//   4. rContains             — recursive search (true/false)
+//   5. BFS                   — level-by-level traversal (Queue)
+//   6. inOrder               — Left → Root → Right (sorted)
+//   7. preOrder              — Root → Left → Right
+//   8. postOrder             — Left → Right → Root
+//   9. deleteNode            — handles all 3 cases (recursive)
+//   10. search               — find/print all nodes with exact value
+//   11. displayLessOrEqual    — all nodes with value <= limit
+//   12. displayGreaterOrEqual — all nodes with value >= limit
 // ============================================================
 
 
@@ -36,11 +39,23 @@ public:
 // ── BST ─────────────────────────────────────────────────────
 
 class BST {
+private:
+    void destroyTree(Node* node) {
+        if (node == nullptr) return;
+        destroyTree(node->left);
+        destroyTree(node->right);
+        delete node;
+    }
+
 public:
     Node* root;
 
     BST() {
         root = nullptr;
+    }
+
+    ~BST() {
+        destroyTree(root);
     }
 
     // ── 1. INSERT (iterative) ──────────────────────────────
@@ -105,7 +120,6 @@ public:
             return rContains(currentNode->left, value);
         }
         return rContains(currentNode->right, value);
-
     }
     bool rContains(int value) {
         return rContains(root, value);
@@ -115,6 +129,7 @@ public:
     // — 5. Breadth First Search:
     // Result: level-by-level order (top to bottom, left to right)
     void BFS() {
+        if (root == nullptr) return;
         queue<Node*> myQueue;
         myQueue.push(root);
 

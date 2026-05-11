@@ -33,11 +33,13 @@ class Stack {
                 cout << "Empty Stack" << endl;
             }
             else {
-                while (temp != nullptr) {
+                while (temp) {
                     cout << temp->value;
                     temp = temp->next;
-                    if (temp != nullptr) {
-                        cout << " -> ";
+                    if (temp) {
+                        cout << endl;
+                        cout << "| " << endl;
+                        cout << "V " << endl;
                     }
                 }
             }
@@ -67,7 +69,7 @@ class Stack {
         //         return;
         //     }
         //     Node* temp = top;
-        //     if (temp->next != nullptr) {
+        //     if (temp->next) {
         //         top = temp->next;
         //         height--;
         //         delete temp;
@@ -82,7 +84,7 @@ class Stack {
             }
             Node* temp = top;
             int poppedValue = top->value;
-            top = top->next;
+            top = temp->next;
             delete temp;
             height--;
             return poppedValue;
@@ -150,26 +152,27 @@ class Stack {
 
 
 int main() {
-     // Stack mystack = Stack(5);
-     // mystack.push(1);
-     // mystack.push(2);
-     // mystack.printStack();
-     // mystack.getHeight();
-     // mystack.getTop();
-     // cout << endl;
-     // cout <<"After popping" << endl;
-     // cout << "Popped value is : " << mystack.pop()<< endl;
-     // mystack.printStack();
-     // mystack.getHeight();
-     // mystack.getTop();
-     // cout <<reverseString("amor");
-     // cout << isBalancedParentheses("())")
-     stack<int> inputStack;
-     inputStack.push(1);
-     inputStack.push(2);
-     inputStack.push(6);
-     inputStack.push(3);
-     sortStack(inputStack);
+     Stack mystack = Stack(5);
+     mystack.push(1);
+     mystack.push(2);
+     mystack.printStack();
+     mystack.getHeight();
+     mystack.getTop();
+     cout << endl;
+     cout <<"After popping" << endl;
+     cout << "Popped value is : " << mystack.pop()<< endl;
+     mystack.printStack();
+     mystack.getHeight();
+     mystack.getTop();
+     cout <<reverseString("amor");
+     cout << endl;
+     cout << isBalancedParentheses("(())");
+     // stack<int> inputStack;
+     // inputStack.push(1);
+     // inputStack.push(2);
+     // inputStack.push(6);
+     // inputStack.push(3);
+     // sortStack(inputStack);
 
 
 
